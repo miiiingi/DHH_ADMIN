@@ -1,4 +1,35 @@
 package study.dhh_admin.domain.owner.entity;
 
+import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Entity
+@NoArgsConstructor
+@Table(name = "owners")
 public class Owner {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true)
+    private String email;
+    private String password;
+    private String name;
+    private int point = 10000;
+
+    @Builder
+    public Owner(String email, String password, String name) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+    }
+
+    public void updatePoint(int point) {
+        this.point = point;
+    }
+
+
 }
