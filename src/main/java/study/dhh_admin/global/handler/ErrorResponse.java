@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import study.deliveryhanghae.global.handler.exception.ErrorCode;
+import study.dhh_admin.global.handler.exception.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;

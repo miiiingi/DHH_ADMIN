@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import study.deliveryhanghae.global.handler.exception.BusinessException;
-import study.deliveryhanghae.global.handler.exception.ErrorCode;
+import study.dhh_admin.global.handler.exception.BusinessException;
+import study.dhh_admin.global.handler.exception.ErrorCode;
 
 @RestControllerAdvice
 @Slf4j
