@@ -3,6 +3,7 @@ package study.dhh_admin.domain.store.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +19,6 @@ import study.dhh_admin.global.security.UserDetailsImpl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.SimpleTimeZone;
 
 @Controller
 @RequiredArgsConstructor
@@ -83,9 +83,17 @@ public class StoreController {
         storeService.deleteOwnerStore(userDetails.getUser());
         model.addAttribute("msg", "삭제가 완료되었습니다.");
 
-        return "storeRegister";
+        return "owner";
     }
 
-
+    @PostMapping("/v2/store/password-check")
+    public ResponseEntity<Boolean> checkPassword(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody String enteredPassword) {
+        enteredPassword = enteredPassword.replaceFirst("password=", "");
+        log.info("password : " + enteredPassword);
+        // 서비스로부터 비밀번호 일치 여부 확인 후 반환
+        boolean check = storeService.checkPassword(userDetails.getPassword(), enteredPassword);
+        log.info(String.valueOf(check));
+        return ResponseEntity.ok(check);
+    }
 
 }

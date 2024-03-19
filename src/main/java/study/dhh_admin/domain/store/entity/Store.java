@@ -24,9 +24,6 @@ public class Store {
     @Column(name = "name", nullable = false)
     private String name;
 
-//    @Column(name = "image_url", nullable = false)
-//    private String imageUrl;
-
     @Column(name = "business_number", nullable = false)
     private String businessNumber;
 

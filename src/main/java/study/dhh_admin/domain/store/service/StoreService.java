@@ -2,9 +2,12 @@ package study.dhh_admin.domain.store.service;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.HtmlUtils;
 import study.dhh_admin.domain.menu.entity.Menu;
 import study.dhh_admin.domain.menu.repository.MenuRepository;
 import study.dhh_admin.domain.owner.entity.Owner;
@@ -26,6 +29,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final MenuRepository menuRepository;
     private final OwnerRepository ownerRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private final String uploadDir = "/Users/aper/Desktop/DHH/DHH_ADMIN/src/main/resources/static/images/";
 
@@ -34,6 +38,10 @@ public class StoreService {
 
         String fullPath = uploadDir + file.getOriginalFilename();
         file.transferTo(new File(fullPath));
+
+        Owner ownerDB = ownerRepository.getReferenceById(owner.getId());
+
+        ownerDB.hasStore();
 
         storeRepository.save(requestDto.toEntity(owner, fullPath, file.getOriginalFilename()));
     }
@@ -65,7 +73,9 @@ public class StoreService {
     @Transactional
     public void deleteOwnerStore(Owner owner) {
 
-        owner.deleteStore();
+        Owner ownerDB = ownerRepository.getReferenceById(owner.getId());
+
+        ownerDB.deleteStore();
 
         storeRepository.deleteByOwner(owner);
 
@@ -92,4 +102,12 @@ public class StoreService {
         return new StoreResponseDto.GetStore(menuLists, store.getName());
     }
 
+    public boolean checkPassword(String password, String inputPassword) {
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        String hashedPassword = encoder.encode(inputPassword);
+
+        return passwordEncoder.matches(password, hashedPassword);
+    }
 }
