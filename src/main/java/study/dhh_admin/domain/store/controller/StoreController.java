@@ -1,6 +1,8 @@
 package study.dhh_admin.domain.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +24,16 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@Slf4j
+@Slf4j(topic = "가게 CRUD")
+@Tag(name = "Store API", description = "가게 CRUD")
+@RequestMapping("/v2")
 public class StoreController {
 
     private final StoreService storeService;
     private final ObjectMapper objectMapper;
 
-
-    @GetMapping("/v2")
+    @Operation(summary = "메인페이지/가게 등록 페이지", description = "storeStatus를 확인해 true면 메인페이지로, false면 가게 등록 페이지로 이동")
+    @GetMapping
     private String ownerStore(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         log.info(String.valueOf(userDetails.getUser().isStoreStatus()));
         if (userDetails.getUser().isStoreStatus() == false) {
@@ -38,7 +42,8 @@ public class StoreController {
         return "owner";
     }
 
-    @PostMapping("/v2/store")
+    @Operation(summary = "가게 등록", description = "가게 등록시 필요한 정보를 입력한 뒤 메인페이지로 이동합니다.")
+    @PostMapping("/store")
     public String createOwnerStore(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                    @RequestPart("file") MultipartFile file,
                                    @RequestPart("request")String jsonData,
@@ -55,7 +60,8 @@ public class StoreController {
         return "owner";
     }
 
-    @GetMapping("/v2/store")
+    @Operation(summary = "가게 조회", description = "가게 상세페이지에 들어갈 가게 이름과 메뉴 리스트를 조회합니다.")
+    @GetMapping("/store")
     public String getOwnerStore(@AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
 
         String storeName = storeService.getOwnerStore(userDetails.getUser().getId()).storeName();
@@ -66,7 +72,8 @@ public class StoreController {
         return "ownerStore";
     }
 
-    @PutMapping("/v2/store")
+    @Operation(summary = "가게 정보 수정", description = "가게의 정보들을 수정합니다.")
+    @PutMapping("/store")
     public String updateOwnerStore(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                    @RequestPart("file") MultipartFile file,
                                    @RequestPart("request")String jsonData,
@@ -78,7 +85,8 @@ public class StoreController {
         return "ownerStore";
     }
 
-    @DeleteMapping("/v2/store")
+    @Operation(summary = "가게 정보 삭제", description = "가게를 삭제한 뒤 가게 등록 페이지로 이동합니다.")
+    @DeleteMapping("/store")
     public String deleteOwnerStore(@AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
         storeService.deleteOwnerStore(userDetails.getUser());
         model.addAttribute("msg", "삭제가 완료되었습니다.");
@@ -86,7 +94,8 @@ public class StoreController {
         return "owner";
     }
 
-    @PostMapping("/v2/store/password-check")
+    @Operation(summary = "패스워드 확인", description = "가게 삭제시 패스워드 확인을 받습니다.")
+    @PostMapping("/store/password-check")
     public ResponseEntity<Boolean> checkPassword(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody String enteredPassword) {
         enteredPassword = enteredPassword.replaceFirst("password=", "");
         log.info("password : " + enteredPassword);
