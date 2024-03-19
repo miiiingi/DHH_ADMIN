@@ -4,12 +4,16 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import study.dhh_admin.domain.store.entity.Store;
 
 @Entity
 @Getter
 @Table(name = "menu")
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE menu SET deleted = true WHERE id = ?")
+@Where(clause = "deleted = false")
 public class Menu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +36,8 @@ public class Menu {
     private Store store;
 
     private String originFileName;
+
+    private Boolean deleted = Boolean.FALSE; // soft delete 구현
 
     @Builder
     public Menu(String name, int price, String imageUrl, String description, Store store, String originFileName) {
