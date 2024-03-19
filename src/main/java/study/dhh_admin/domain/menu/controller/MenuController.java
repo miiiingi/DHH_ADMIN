@@ -76,4 +76,12 @@ public class MenuController {
         }
     }
 
+    @DeleteMapping("/menu/{id}")
+    @ResponseBody
+    public String deleteMenu( @PathVariable Long id){
+        menuService.deleteMenu(id);
+        String message = "정상적으로 삭제되었습니다.";
+        return message;
+    }
+
 }

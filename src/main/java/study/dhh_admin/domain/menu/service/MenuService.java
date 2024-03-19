@@ -88,6 +88,12 @@ public class MenuService {
         );
 
     }
+    
+    // 메뉴 삭제
+    public void deleteMenu(Long id) {
+        Menu menu = hasMenu(id);
+        menuRepository.delete(menu);
+    }
 
 
     // 유저 가게 정보 확인
