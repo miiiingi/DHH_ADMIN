@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +15,6 @@ import study.dhh_admin.domain.menu.dto.MenuRequestDto;
 import study.dhh_admin.domain.menu.service.MenuService;
 import study.dhh_admin.domain.owner.entity.Owner;
 import study.dhh_admin.domain.store.dto.StoreResponseDto;
-import study.dhh_admin.domain.store.entity.Store;
-import study.dhh_admin.domain.user.entity.User;
 import study.dhh_admin.global.handler.exception.BusinessException;
 import study.dhh_admin.global.handler.exception.ErrorCode;
 import study.dhh_admin.global.security.UserDetailsImpl;
@@ -76,6 +72,7 @@ public class MenuController {
         }
     }
 
+    @Operation(summary = "메뉴를 삭제합니다.", description = "메뉴를 삭제합니다.")
     @DeleteMapping("/menu/{id}")
     @ResponseBody
     public String deleteMenu( @PathVariable Long id){
