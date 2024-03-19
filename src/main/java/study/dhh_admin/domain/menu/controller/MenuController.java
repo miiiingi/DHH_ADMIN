@@ -8,12 +8,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import study.dhh_admin.domain.menu.dto.MenuRequestDto;
 import study.dhh_admin.domain.menu.service.MenuService;
 import study.dhh_admin.domain.owner.entity.Owner;
+import study.dhh_admin.domain.store.dto.StoreResponseDto;
 import study.dhh_admin.domain.store.entity.Store;
 import study.dhh_admin.domain.user.entity.User;
 import study.dhh_admin.global.handler.exception.BusinessException;
@@ -47,5 +47,13 @@ public class MenuController {
         }
     }
 
+    @GetMapping("/menu/{id}")
+    public String getMenu(@PathVariable Long id, Model model, @AuthenticationPrincipal UserDetailsImpl userDetails){
+
+        Owner owner = userDetails.getUser();
+        StoreResponseDto.GetMenuList menu = menuService.getMenu(id, owner);
+        model.addAttribute("menu",menu);
+        return "menuDetail";
+    }
 
 }

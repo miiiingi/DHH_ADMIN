@@ -10,11 +10,16 @@ import study.dhh_admin.domain.menu.dto.MenuRequestDto;
 import study.dhh_admin.domain.menu.entity.Menu;
 import study.dhh_admin.domain.menu.repository.MenuRepository;
 import study.dhh_admin.domain.owner.entity.Owner;
+import study.dhh_admin.domain.store.dto.StoreResponseDto;
 import study.dhh_admin.domain.store.entity.Store;
 import study.dhh_admin.domain.store.repository.StoreRepository;
+import study.dhh_admin.global.handler.exception.BusinessException;
 
 import java.io.File;
 import java.io.IOException;
+
+import static study.dhh_admin.global.handler.exception.ErrorCode.NOT_FOUND_STORE_MENU;
+
 @Slf4j(topic = "menuService")
 @Service
 @RequiredArgsConstructor
@@ -28,8 +33,7 @@ public class MenuService {
     @Transactional
     public void createMenu(MenuRequestDto.CreateMenuDto requestDto, Owner owner) throws IOException {
         // owner 정보에서 가게 정보 뽑기
-        Store store = storeRepository.findByOwnerId(owner.getId());
-        log.info("img path : " + uploadDir);
+        Store store = getStoreByOwner(owner);
 
         MultipartFile file = requestDto.menuImg();
         String originFileName = file.getOriginalFilename(); // img 원본 이름
@@ -38,5 +42,38 @@ public class MenuService {
         Menu menu = requestDto.toEntity(store, imageUrl, originFileName);
 
         menuRepository.save(menu);
+    }
+
+    public StoreResponseDto.GetMenuList getMenu(Long id, Owner owner) {
+        // 유저의 가게 가져오기
+        Store store = getStoreByOwner(owner);
+
+        // user store id 와 menu store id 비교
+        Long storeId = store.getId();
+
+        // 메뉴 존재하는지 확인
+        Menu menu = menuRepository.findById(id).orElseThrow(
+                () -> new BusinessException(NOT_FOUND_STORE_MENU)
+        );
+
+        // 유저 가게 정보와 메뉴 가게 정보가 일치여부 확인
+        if (!(storeId == menu.getStore().getId())) {
+            throw new BusinessException(NOT_FOUND_STORE_MENU);
+        }
+
+        return new StoreResponseDto.GetMenuList(
+                menu.getId(),
+                menu.getName(),
+                menu.getPrice(),
+                menu.getImageUrl(),
+                menu.getDescription());
+    }
+
+
+
+
+    // 유저 가게 정보 확인
+    private Store getStoreByOwner(Owner owner) {
+        return storeRepository.findByOwnerId(owner.getId());
     }
 }
