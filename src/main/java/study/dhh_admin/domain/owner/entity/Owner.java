@@ -18,6 +18,7 @@ public class Owner {
     private String email;
     private String password;
     private String name;
+    private boolean storeStatus;
     private int point = 10000;
 
     @Builder
@@ -27,9 +28,12 @@ public class Owner {
         this.name = name;
     }
 
-    public void updatePoint(int point) {
-        this.point = point;
+    public void hasStore() {
+        this.storeStatus = true;
     }
 
+    public void deleteStore() {
+        this.storeStatus = false;
+    }
 
 }

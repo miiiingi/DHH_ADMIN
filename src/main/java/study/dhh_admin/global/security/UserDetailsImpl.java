@@ -1,6 +1,7 @@
 package study.dhh_admin.global.security;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import study.dhh_admin.domain.owner.entity.Owner;
 
