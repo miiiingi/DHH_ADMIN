@@ -106,33 +106,41 @@
                 <ul class="list-unstyled d-flex flex-column gap-2 text text-center">
                     <li>
                         <div>
-                            <strong class="d-block" name="storeName" th:name="menuName" th:text="${menu.menuName()}"></strong>
-                            <img th:src="@{${menu.menuUrl()}}" class="rounded mx-auto d-block" alt="메뉴 이미지" width="200px" height="200px" >
+                            <strong class="d-block" th:name="menuName" id="menuNameText" th:text="${menu.menuName()}"></strong>
+                            <input type="text" class="form-control" id="menuNameInput" style="display: none;">
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <img th:src="@{${menu.menuUrl()}}" id="menuImg" class="rounded mx-auto d-block" alt="메뉴 이미지" width="200px" height="200px" >
+                            <input type="file" class="form-control" id="menuImgInput" style="display: none;">
                         </div>
                     </li>
                     <li>
                         <div>
                             <strong class="d-block">메뉴 설명</strong>
-                            <small th:name="menuDesc" th:text="${menu.menuDescription()}"></small>
+                            <small th:name="menuDesc"  id="menuDescText" th:text="${menu.menuDescription()}"></small>
+                            <input type="text" class="form-control" id="menuDescInput" style="display: none;">
                         </div>
                     </li>
                     <li>
                         <div>
                             <strong class="d-block">메뉴 가격</strong>
-                            <small th:name="menuPrice" th:text="${menu.menuPrice()}"></small>
+                            <small th:name="menuPrice" id="menuPriceText" th:text="${menu.menuPrice()}"></small>
+                            <input type="number" class="form-control" id="menuPriceInput" style="display: none;">
                         </div>
                     </li>
                 </ul>
             </nav>
         </div>
     </div>
-    <!-- 모달 연결 버틍-->
-    <button class="btn btn-sm btn-outline-secondary" th:attr="data-menuId=${menu.menuId}" onclick="updateMenu(this.getAttribute('data-menuId'))">메뉴 수정</button>
+    <!-- 메뉴 수정 버튼-->
+    <button class="btn btn-sm btn-outline-secondary" th:attr="data-menuId=${menu.menuId}" id="editMenuButton" onclick="editMenu(this.getAttribute('data-menuId'))">메뉴 수정</button>
+    <button class="btn btn-sm btn-outline-secondary" th:attr="data-menuId=${menu.menuId}" onclick="cancelEdit(this.getAttribute('data-menuId'))">취소</button>
     <button type="button" class="btn btn-sm btn-outline-secondary" th:attr="data-menuId=${menu.menuId}" onclick="deleteMenu(this.getAttribute('data-menuId'))">메뉴 삭제</button>
 </section>
 
 <main>
-
 </main>
 
 
@@ -169,24 +177,55 @@
         window.location.href = host + '/';
     }
 
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('preview').src = e.target.result;
-            };
-            reader.readAsDataURL(input.files[0]);
-        } else {
-            document.getElementById('preview').src = "";
-        }
+
+    // 수정 버튼 클릭 시 실행되는 함수
+    let originalEditButtonClick = null;
+    function editMenu(menuId) {
+        // 각 항목의 현재 내용을 가져와서 input 태그로 변경
+        let menuName = $('#menuNameText').text().trim();
+        $('#menuNameText').hide(); // 텍스트 숨기기
+        $('#menuNameInput').val(menuName).show(); // 입력 필드 보이기
+
+        let menuDesc = $('#menuDescText').text().trim();
+        $('#menuDescText').hide(); // 텍스트 숨기기
+        $('#menuDescInput').val(menuDesc).show(); // 입력 필드 보이기
+
+        let menuPrice = $('#menuPriceText').text().trim();
+        $('#menuPriceText').hide(); // 텍스트 숨기기
+        $('#menuPriceInput').val(menuPrice).show(); // 입력 필드 보이기
+
+        $('#menuImg').hide(); // hide image
+        $('#menuImgInput').show();
+
+        // 'Edit Menu' 버튼을 'Update Menu' 버튼으로 변경
+        $('#editMenuButton').attr('onclick', `updateMenu(${menuId})`);
+    }
+
+    // 취소 버튼 클릭 시 실행되는 함수
+    function cancelEdit(menuId) {
+        // 각 항목의 입력 필드를 숨기고 텍스트로 변경
+        $('#menuNameInput').hide();
+        $('#menuNameText').show();
+
+        $('#menuDescInput').hide();
+        $('#menuDescText').show();
+
+        $('#menuPriceInput').hide();
+        $('#menuPriceText').show();
+
+        $('#menuImgInput').hide();
+        $('#menuImg').show(); // Show image
+
+        // 'Update Menu' 버튼을 'Edit Menu' 버튼으로 변경
+        $('#editMenuButton').attr('onclick', `editMenu(${menuId})`);
     }
 
     // 메뉴 수정
     function updateMenu(menuId){
-        let menuName = $('#name_' + menuId).val();
-        let menuDesc = $('#desc_' + menuId).val();
-        let menuPrice = $('#price_' + menuId).val();
-        let menuImg = $('#menuImg')[0].files[0];
+        let menuName = $('#menuNameInput').val();
+        let menuDesc = $('#menuDescInput').val();
+        let menuPrice = $('#menuPriceInput').val();
+        let menuImg = $('#menuImgInput')[0].files[0];
 
 
         console.log(menuPrice);
@@ -207,8 +246,8 @@
             contentType: false,
             data: formData,
             success: function(response){
-                // alert(response);
-                window.location.replace("v2/store");
+                alert(response);
+                window.location.href = "/v2/menu/" + menuId;
             },
             error: function(request, status, error){
                 alert(error)
@@ -216,14 +255,14 @@
         });
     }
 
-
+    // 삭제 버튼 script
     function deleteMenu(menuId) {
         alert("삭제버튼클릭" + menuId);
         $.ajax({
             type: 'DELETE',
             url: window.location.href,
             success: function (response) {
-                alert("CONTROLLER RETURN VALUE : " + response);
+                alert(response);
                 window.history.back();
             },
             error: function (e) {
@@ -232,7 +271,6 @@
         });
     }
 </script>
-
 
 </body>
 

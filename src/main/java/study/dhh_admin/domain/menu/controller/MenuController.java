@@ -4,12 +4,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import study.dhh_admin.domain.menu.dto.MenuRequestDto;
 import study.dhh_admin.domain.menu.service.MenuService;
 import study.dhh_admin.domain.owner.entity.Owner;
@@ -47,6 +50,7 @@ public class MenuController {
         }
     }
 
+    @Operation(summary = "선택 메뉴 상세 페이지 이동", description = "선택한 메뉴의 상세페이지로 이동합니다.")
     @GetMapping("/menu/{id}")
     public String getMenu(@PathVariable Long id, Model model, @AuthenticationPrincipal UserDetailsImpl userDetails){
 
@@ -54,6 +58,22 @@ public class MenuController {
         StoreResponseDto.GetMenuList menu = menuService.getMenu(id, owner);
         model.addAttribute("menu",menu);
         return "menuDetail";
+    }
+
+    @Operation(summary = "메뉴의 내용 수정", description = "메뉴의 내용을 수정합니다.")
+    @PutMapping("/menu/{id}")
+    @ResponseBody
+    public ResponseEntity<String> updateMenu(@PathVariable Long id, @RequestPart(value="key") MenuRequestDto.UpdateMenuDto requestDto,
+                             @RequestPart(value = "menuImg", required = false) MultipartFile menuImg) throws IOException {
+
+        try{
+            menuService.updateMenu( id, requestDto,menuImg);
+            String message = "수정이 완료되었습니다.";
+            return ResponseEntity.status(HttpStatus.CREATED).body(message);
+
+        }catch (IOException e){
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

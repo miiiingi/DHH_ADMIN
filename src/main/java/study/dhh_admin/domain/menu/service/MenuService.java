@@ -17,6 +17,7 @@ import study.dhh_admin.global.handler.exception.BusinessException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 import static study.dhh_admin.global.handler.exception.ErrorCode.NOT_FOUND_STORE_MENU;
 
@@ -57,7 +58,7 @@ public class MenuService {
         );
 
         // 유저 가게 정보와 메뉴 가게 정보가 일치여부 확인
-        if (!(storeId == menu.getStore().getId())) {
+        if (!(Objects.equals(storeId, menu.getStore().getId()))) {
             throw new BusinessException(NOT_FOUND_STORE_MENU);
         }
 
@@ -69,11 +70,36 @@ public class MenuService {
                 menu.getDescription());
     }
 
+    @Transactional
+    public void updateMenu(Long id, MenuRequestDto.UpdateMenuDto requestDto, MultipartFile menuImg) throws IOException {
+        // 메뉴 존재하는지 확인
+        Menu menu = hasMenu(id);
 
+        if(menuImg != null){
+            String fullPath = uploadDir + menuImg.getOriginalFilename();
+            menuImg.transferTo(new File(fullPath));
+            menu.imgUpdate(fullPath, menuImg.getOriginalFilename());
+        }
+        // 메뉴 업데이트
+        menu.update(
+                requestDto.menuName(),
+                requestDto.menuPrice(),
+                requestDto.menuDesc()
+        );
+
+    }
 
 
     // 유저 가게 정보 확인
     private Store getStoreByOwner(Owner owner) {
         return storeRepository.findByOwnerId(owner.getId());
     }
+
+    // 존재하는 메뉴인지 확인
+    private Menu hasMenu(Long menuId) {
+        return menuRepository.findById(menuId).orElseThrow(
+                () -> new BusinessException(NOT_FOUND_STORE_MENU)
+        );
+    }
+
 }
