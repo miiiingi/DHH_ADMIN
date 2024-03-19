@@ -8,6 +8,7 @@ import study.dhh_admin.domain.store.entity.Store;
 
 @Entity
 @Getter
+@Table(name = "menu")
 @NoArgsConstructor
 public class Menu {
     @Id
@@ -30,13 +31,26 @@ public class Menu {
     @JoinColumn(name ="store_id")
     private Store store;
 
+    private String originFileName;
+
     @Builder
-    public Menu(Long id, String name, int price, String imageUrl, String description, Store store) {
-        this.id = id;
+    public Menu(String name, int price, String imageUrl, String description, Store store, String originFileName) {
         this.name = name;
         this.price = price;
         this.imageUrl = imageUrl;
         this.description = description;
         this.store = store;
+        this.originFileName = originFileName;
+    }
+
+    public void update(String name, int price, String description) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
+    }
+
+    public void imgUpdate(String imageUrl, String originFileName) {
+        this.originFileName = originFileName;
+        this.imageUrl = imageUrl;
     }
 }
